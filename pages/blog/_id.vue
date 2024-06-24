@@ -1,18 +1,48 @@
 <template>
-    <div>
-      <h1 class="text-4xl font-bold mb-4">{{ blog.title }}</h1>
-      <img :src="blog.image.url" alt="blog image" class="mb-4">
-      <div v-html="blog.content" class="prose"></div>
+  <div>
+    <h1 class="text-4xl font-bold mb-8">Blog Detail</h1>
+    <div v-if="blog">
+      <h2 class="text-2xl text-blue-600">{{ blog.title }}</h2>
+      <div v-html="convertPToBr(blog.content)"></div>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    async asyncData({ $axios, params }) {
-      const { data } = await $axios.get(`/blog/${params.id}`, {
-        headers: { 'X-API-KEY': process.env.apiKey }
+    <div v-else>
+      <p v-if="error">Error loading blog: {{ error.message }}</p>
+      <p v-else>Loading...</p>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      blog: null,
+      error: null,
+    };
+  },
+  methods: {
+    convertPToBr(content) {
+      return content.replace(/<\/p>/g, '<br>').replace(/<p>/g, '');
+    }
+  },
+  async fetch() {
+    const blogId = this.$route.params.id;
+    console.log('Fetching blog ID:', blogId);
+
+    try {
+      const { data } = await this.$axios.get(`/blog/${blogId}`, {
+        headers: { 'X-MICROCMS-API-KEY': process.env.apiKey }
       });
-      return { blog: data };
+      console.log('Fetched blog data:', data);
+      this.blog = data;
+    } catch (error) {
+      console.error('Error fetching blog:', error);
+      this.error = error;
     }
   }
-  </script>
+}
+</script>
+
+<style>
+/* You can add custom styles here if needed */
+</style>
