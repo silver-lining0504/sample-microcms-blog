@@ -4,6 +4,7 @@
     <div v-if="blog">
       <h2 class="text-2xl text-blue-600">{{ blog.title }}</h2>
       <div v-html="convertPToBr(blog.content)"></div>
+      <img :src="blog.thumbnail.url" class="size-6/12">
     </div>
     <div v-else>
       <p v-if="error">Error loading blog: {{ error.message }}</p>
